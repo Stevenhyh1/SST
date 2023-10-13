@@ -1,0 +1,3 @@
+[submodule "submodules/TorchEx"]
+	path = submodules/TorchEx
+	url = git@github.com:Abyssaledge/TorchEx.git

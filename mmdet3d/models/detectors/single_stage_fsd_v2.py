@@ -114,7 +114,8 @@ class SingleStageFSDV2(SingleStage3DDetector):
         voxel_size = torch.tensor(self.virtual_voxel_size, device=device)
         pc_range = torch.tensor(self.point_cloud_range, device=device)
 
-        res_coors = torch.div(points[:, :3] - pc_range[None, :3], voxel_size[None, :], rounding_mode='floor').long()
+        # res_coors = torch.div(points[:, :3] - pc_range[None, :3], voxel_size[None, :], rounding_mode='floor').long()
+        res_coors = torch.div(points[:, :3] - pc_range[None, :3], voxel_size[None, :]).floor().long()
         res_coors = res_coors[:, [2, 1, 0]] # to zyx order
 
         coors_batch = torch.cat([batch_idx[:, None], res_coors], dim=1)

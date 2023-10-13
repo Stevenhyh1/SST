@@ -4,6 +4,7 @@ from .custom_3d import Custom3DDataset
 from .custom_3d_seg import Custom3DSegDataset
 from .kitti_dataset import KittiDataset
 from .kitti_mono_dataset import KittiMonoDataset
+from .torc_dataset import TorcDataset
 from .lyft_dataset import LyftDataset
 from .nuscenes_dataset import NuScenesDataset
 from .nuscenes_mono_dataset import NuScenesMonoDataset
@@ -26,7 +27,7 @@ from .build_dataloader_sequential import build_dataloader_sequential
 from .waymo_tracklet_dataset import WaymoTrackletDataset
 
 __all__ = [
-    'KittiDataset', 'KittiMonoDataset', 'GroupSampler',
+    'KittiDataset', 'TorcDataset', 'KittiMonoDataset', 'GroupSampler',
     'DistributedGroupSampler', 'build_dataloader', 'RepeatFactorDataset',
     'DATASETS', 'build_dataset', 'CocoDataset', 'NuScenesDataset',
     'NuScenesMonoDataset', 'LyftDataset', 'ObjectSample', 'RandomFlip3D',

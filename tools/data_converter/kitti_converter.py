@@ -38,8 +38,8 @@ def convert_to_kitti_info_version2(info):
 
 def _read_imageset_file(path):
     with open(path, 'r') as f:
-        lines = f.readlines()
-    return [int(line) for line in lines]
+        lines = f.read().splitlines()
+    return lines
 
 
 def _calculate_num_points_in_gt(data_path,
@@ -120,7 +120,7 @@ def create_kitti_info_file(data_path,
     mmcv.dump(kitti_infos_train, filename)
     kitti_infos_val = get_kitti_image_info(
         data_path,
-        training=True,
+        training=False,
         velodyne=True,
         calib=True,
         image_ids=val_img_ids,

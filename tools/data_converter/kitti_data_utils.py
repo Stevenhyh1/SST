@@ -22,8 +22,8 @@ def get_kitti_info_path(idx,
                         relative_path=True,
                         exist_check=True,
                         use_prefix_id=False):
-    img_idx_str = get_image_index_str(idx, use_prefix_id)
-    img_idx_str += file_tail
+    # img_idx_str = get_image_index_str(idx, use_prefix_id)
+    img_idx_str = idx + file_tail
     prefix = Path(prefix)
     if training:
         file_path = Path('training') / info_type / img_idx_str
@@ -45,7 +45,7 @@ def get_image_path(idx,
                    info_type='image_2',
                    use_prefix_id=False):
     exist_check=False
-    return get_kitti_info_path(idx, prefix, info_type, '.png', training,
+    return get_kitti_info_path(idx, prefix, info_type, '.jpg', training,
                                relative_path, exist_check, use_prefix_id)
 
 

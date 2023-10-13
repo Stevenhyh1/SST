@@ -34,7 +34,7 @@ def kitti_data_prep(root_path, info_prefix, version, out_dir):
     kitti.export_2d_annotation(root_path, info_test_path)
 
     create_groundtruth_database(
-        'KittiDataset',
+        'TorcDataset',
         root_path,
         info_prefix,
         f'{out_dir}/{info_prefix}_infos_train.pkl',
