@@ -121,9 +121,9 @@ class VoteSegHead(Base3DDecodeHead):
 
         vote_preds = vote_preds.reshape(-1, self.num_classes, 3)
         if not self.use_sigmoid:
-            assert seg_label.max().item() == self.num_classes - 1
+            assert seg_label.max().item() <= self.num_classes - 1
         else:
-            assert seg_label.max().item() == self.num_classes
+            assert seg_label.max().item() <= self.num_classes
         valid_vote_preds = vote_preds[vote_mask] # [n_valid, num_cls, 3]
         valid_vote_preds = valid_vote_preds.reshape(-1, 3)
         num_valid = vote_mask.sum()
