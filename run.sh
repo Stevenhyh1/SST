@@ -11,5 +11,5 @@ WORK=work_dirs
 # fast Waymo Evaluation, for all waymo-based models
 # bash tools/dist_test.sh configs/$DIR/$CONFIG.py ./$WORK/$CONFIG/latest.pth 8 --options "pklfile_prefix=./$WORK/$CONFIG/results" --eval fast
 
-CONFIG=fsdv2_nusc_2x
-bash tools/dist_train.sh configs/$DIR/$CONFIG.py 8 --work-dir ./$WORK/$CONFIG/ --cfg-options evaluation.jsonfile_prefix=./$WORK/$CONFIG/results evaluation.metric=bbox --seed 1
+CONFIG=fsdv2_torc_2x
+bash tools/dist_train.sh configs/$DIR/$CONFIG.py 2 --work-dir ./$WORK/$CONFIG/ --cfg-options evaluation.jsonfile_prefix=./$WORK/$CONFIG/results evaluation.metric=bbox --launcher pytorch --seed 1

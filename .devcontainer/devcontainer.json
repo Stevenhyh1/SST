@@ -16,7 +16,9 @@
 		"--ipc=host"
 	],
 	"remoteEnv": {
-		"PYTHONPATH": "${containerEnv:PATH}:${localWorkspaceFolder}/mmdet3d"
+		"PYTHONPATH": "${containerEnv:PATH}:${localWorkspaceFolder}/mmdet3d",
+		"NCCL_DEBUG": "INFO",
+		"TORCH_DISTRIBUTED_DEBUG": "DETAIL"
 	},
 	"mounts": ["source=/data,target=/data,type=bind,consistency=cached"],
 	"customizations": {
