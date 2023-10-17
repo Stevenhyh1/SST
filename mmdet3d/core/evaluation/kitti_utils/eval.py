@@ -26,7 +26,13 @@ def get_thresholds(scores: np.ndarray, num_gt, num_sample_pts=41):
 
 
 def clean_data(gt_anno, dt_anno, current_class, difficulty):
-    CLASS_NAMES = ['car', 'pedestrian', 'cyclist']
+    CLASS_NAMES = ["Dynamic--Vehicle--Passenger--Car",
+                "Dynamic--Vehicle--SemiTruck--Trailer",
+                "Dynamic--Vehicle--SemiTruck--Cab",
+                "Dynamic--Vehicle",
+                "Static--RoadObstruction--Barrel",
+                "Static--RoadObstruction--TemporaryBarrier",
+                "Static--RoadObstruction--Cone"]
     MIN_HEIGHT = [40, 25, 25]
     MAX_OCCLUSION = [0, 1, 2]
     MAX_TRUNCATION = [0.15, 0.3, 0.5]
@@ -51,8 +57,7 @@ def clean_data(gt_anno, dt_anno, current_class, difficulty):
             valid_class = -1
         ignore = False
         if ((gt_anno['occluded'][i] > MAX_OCCLUSION[difficulty])
-                or (gt_anno['truncated'][i] > MAX_TRUNCATION[difficulty])
-                or (height <= MIN_HEIGHT[difficulty])):
+                or (gt_anno['truncated'][i] > MAX_TRUNCATION[difficulty])):
             ignore = True
         if valid_class == 1 and not ignore:
             ignored_gt.append(0)
@@ -590,7 +595,7 @@ def do_eval(gt_annos,
             min_overlaps,
             eval_types=['bbox', 'bev', '3d']):
     # min_overlaps: [num_minoverlap, metric, num_class]
-    difficultys = [0, 1, 2]
+    difficulties = [0, 1, 2]
     mAP_bbox = None
     mAP_aos = None
     if 'bbox' in eval_types:
@@ -598,7 +603,7 @@ def do_eval(gt_annos,
             gt_annos,
             dt_annos,
             current_classes,
-            difficultys,
+            difficulties,
             0,
             min_overlaps,
             compute_aos=('aos' in eval_types))
@@ -609,13 +614,13 @@ def do_eval(gt_annos,
 
     mAP_bev = None
     if 'bev' in eval_types:
-        ret = eval_class(gt_annos, dt_annos, current_classes, difficultys, 1,
+        ret = eval_class(gt_annos, dt_annos, current_classes, difficulties, 1,
                          min_overlaps)
         mAP_bev = get_mAP(ret['precision'])
 
     mAP_3d = None
     if '3d' in eval_types:
-        ret = eval_class(gt_annos, dt_annos, current_classes, difficultys, 2,
+        ret = eval_class(gt_annos, dt_annos, current_classes, difficulties, 2,
                          min_overlaps)
         mAP_3d = get_mAP(ret['precision'])
     return mAP_bbox, mAP_bev, mAP_3d, mAP_aos
@@ -659,21 +664,14 @@ def kitti_eval(gt_annos,
     assert len(eval_types) > 0, 'must contain at least one evaluation type'
     if 'aos' in eval_types:
         assert 'bbox' in eval_types, 'must evaluate bbox when evaluating aos'
-    overlap_0_7 = np.array([[0.7, 0.5, 0.5, 0.7,
-                             0.5], [0.7, 0.5, 0.5, 0.7, 0.5],
-                            [0.7, 0.5, 0.5, 0.7, 0.5]])
-    overlap_0_5 = np.array([[0.7, 0.5, 0.5, 0.7, 0.5],
-                            [0.5, 0.25, 0.25, 0.5, 0.25],
-                            [0.5, 0.25, 0.25, 0.5, 0.25]])
-    min_overlaps = np.stack([overlap_0_7, overlap_0_5], axis=0)  # [2, 3, 5]
-    class_to_name = {
-        0: 'Car',
-        1: 'Pedestrian',
-        2: 'Cyclist',
-        3: 'Van',
-        4: 'Person_sitting',
-    }
+    class_to_name = {i:cls for i, cls in enumerate(current_classes)}
+    class_to_name[None] = "DetectionOnly"
+    overlap_0_7 = np.full((3,len(class_to_name)), 0.7)
+    overlap_0_5 = np.full((3,len(class_to_name)), 0.5)
+    min_overlaps = np.stack([overlap_0_7, overlap_0_5], axis=0) 
     name_to_class = {v: n for n, v in class_to_name.items()}
+    name_to_class["DetectionOnly"] = None
+
     if not isinstance(current_classes, (list, tuple)):
         current_classes = [current_classes]
     current_classes_int = []
@@ -685,22 +683,22 @@ def kitti_eval(gt_annos,
     current_classes = current_classes_int
     min_overlaps = min_overlaps[:, :, current_classes]
     result = ''
-    # check whether alpha is valid
+    # check whether alpha is valid    compute_aos = False
     compute_aos = False
-    pred_alpha = False
-    valid_alpha_gt = False
-    for anno in dt_annos:
-        mask = (anno['alpha'] != -10)
-        if anno['alpha'][mask].shape[0] != 0:
-            pred_alpha = True
-            break
-    for anno in gt_annos:
-        if anno['alpha'][0] != -10:
-            valid_alpha_gt = True
-            break
-    compute_aos = (pred_alpha and valid_alpha_gt)
-    if compute_aos:
-        eval_types.append('aos')
+    # pred_alpha = False
+    # valid_alpha_gt = False
+    # for anno in dt_annos:
+    #     mask = (anno['alpha'] != -10)
+    #     if anno['alpha'][mask].shape[0] != 0:
+    #         pred_alpha = True
+    #         break
+    # for anno in gt_annos:
+    #     if anno['alpha'][0] != -10:
+    #         valid_alpha_gt = True
+    #         break
+    # compute_aos = (pred_alpha and valid_alpha_gt)
+    # if compute_aos:
+    #     eval_types.append('aos')
 
     mAPbbox, mAPbev, mAP3d, mAPaos = do_eval(gt_annos, dt_annos,
                                              current_classes, min_overlaps,
@@ -731,7 +729,7 @@ def kitti_eval(gt_annos,
                     *mAPaos[j, :, i])
 
             # prepare results for logger
-            for idx in range(3):
+            for idx in range(len(difficulty)):
                 if i == 0:
                     postfix = f'{difficulty[idx]}_strict'
                 else:

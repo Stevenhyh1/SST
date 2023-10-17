@@ -100,7 +100,7 @@ def parse_args():
 
 
 def main():
-    torch.backends.cuda.matmul.allow_tf32 = False # prevent matmul error in 3090, a very tricky bug.
+    # torch.backends.cuda.matmul.allow_tf32 = False # prevent matmul error in 3090, a very tricky bug.
     args = parse_args()
 
     assert args.out or args.eval or args.format_only or args.show \

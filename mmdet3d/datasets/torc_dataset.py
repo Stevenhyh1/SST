@@ -371,7 +371,7 @@ class TorcDataset(Custom3DDataset):
                 )
             else:
                 ap_result_str, ap_dict = kitti_eval(
-                    gt_annos, result_files, self.CLASSES
+                    gt_annos, result_files, self.CLASSES, eval_types=["bev"]
                 )
             print_log("\n" + ap_result_str, logger=logger)
 
@@ -493,7 +493,7 @@ class TorcDataset(Custom3DDataset):
                         )
 
             annos[-1]["sample_idx"] = np.array(
-                [sample_idx] * len(annos[-1]["score"]), dtype=np.int64
+                [sample_idx.split('_')[-1]] * len(annos[-1]["score"]), dtype=np.int64
             )
 
             det_annos += annos

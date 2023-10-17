@@ -78,11 +78,7 @@ train_pipeline = [
     dict(type="Collect3D", keys=["points", "gt_bboxes_3d", "gt_labels_3d"]),
 ]
 test_pipeline = [
-    dict(
-        type="LoadPointsFromFile",
-        coord_type="LIDAR",
-        load_dim=4,
-    ),
+    dict(type="LoadPointsFromFile", coord_type="LIDAR", load_dim=4, use_dim=4),
     dict(
         type="MultiScaleFlipAug3D",
         img_scale=(1333, 800),
@@ -103,9 +99,7 @@ test_pipeline = [
             ),
             dict(
                 type="Collect3D",
-                keys=[
-                    "points",
-                ],
+                keys=["points"],
             ),
         ],
     ),
@@ -131,27 +125,14 @@ data = dict(
             box_type_3d="LiDAR",
         ),
     ),
-    val=dict(
-        type=dataset_type,
-        data_root=data_root,
-        ann_file=data_root + "kitti_infos_val.pkl",
-        split="training",
-        pts_prefix="velodyne_reduced",
-        pipeline=test_pipeline,
-        modality=input_modality,
-        classes=class_names,
-        test_mode=True,
-        box_type_3d="LiDAR",
-    ),
     test=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file=data_root + "kitti_infos_val.pkl",
+        ann_file=data_root + "kitti_infos_train.pkl",
         split="training",
-        pts_prefix="velodyne_reduced",
         pipeline=test_pipeline,
-        modality=input_modality,
         classes=class_names,
+        modality=input_modality,
         test_mode=True,
         box_type_3d="LiDAR",
     ),
