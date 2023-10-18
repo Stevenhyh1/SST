@@ -177,8 +177,9 @@ def create_groundtruth_database(dataset_class_name,
                 use_lidar=True,
                 use_depth=False,
                 use_lidar_intensity=True,
-                use_camera=with_mask,
+                use_camera=False,
             ),
+            pcd_limit_range=[-204.8, -204.8, -3.2, 204.8, 204.8, 3.2],
             pipeline=[
                 dict(
                     type='LoadPointsFromFile',

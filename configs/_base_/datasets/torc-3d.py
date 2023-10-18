@@ -14,7 +14,7 @@ class_names = [
     "Static--RoadObstruction--Cone",
 ]
 point_cloud_range = [-204.8, -204.8, -3.2, 204.8, 204.8, 3.2]
-input_modality = dict(use_lidar=True, use_camera=True)
+input_modality = dict(use_lidar=True, use_camera=False)
 db_sampler = dict(
     data_root=data_root,
     info_path=data_root + "kitti_dbinfos_train.pkl",
@@ -123,18 +123,32 @@ data = dict(
             classes=class_names,
             test_mode=False,
             box_type_3d="LiDAR",
+            pcd_limit_range=point_cloud_range,
         ),
     ),
-    test=dict(
+    val=dict(
         type=dataset_type,
         data_root=data_root,
-        ann_file=data_root + "kitti_infos_train.pkl",
-        split="training",
+        ann_file=data_root + "kitti_infos_val.pkl",
+        split="testing",
         pipeline=test_pipeline,
         classes=class_names,
         modality=input_modality,
         test_mode=True,
         box_type_3d="LiDAR",
+        pcd_limit_range=point_cloud_range
+    ),
+    test=dict(
+        type=dataset_type,
+        data_root=data_root,
+        ann_file=data_root + "kitti_infos_val.pkl",
+        split="testing",
+        pipeline=test_pipeline,
+        classes=class_names,
+        modality=input_modality,
+        test_mode=True,
+        box_type_3d="LiDAR",
+        pcd_limit_range=point_cloud_range
     ),
 )
 evaluation = dict(interval=24, pipeline=test_pipeline)

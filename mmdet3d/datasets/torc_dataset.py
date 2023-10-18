@@ -69,6 +69,7 @@ class TorcDataset(Custom3DDataset):
         data_root,
         ann_file,
         split,
+        pcd_limit_range,
         pts_prefix="velodyne",
         pipeline=None,
         classes=None,
@@ -76,7 +77,6 @@ class TorcDataset(Custom3DDataset):
         box_type_3d="LiDAR",
         filter_empty_gt=True,
         test_mode=False,
-        pcd_limit_range=[0, -40, -3, 70.4, 40, 0.0],
     ):
         super().__init__(
             data_root=data_root,
