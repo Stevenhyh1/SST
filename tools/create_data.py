@@ -21,16 +21,16 @@ def kitti_data_prep(root_path, info_prefix, version, out_dir):
         out_dir (str): Output directory of the groundtruth database info.
     """
     kitti.create_kitti_info_file(root_path, info_prefix)
-    kitti.create_reduced_point_cloud(root_path, info_prefix)
+    # kitti.create_reduced_point_cloud(root_path, info_prefix)
 
     info_train_path = osp.join(root_path, f'{info_prefix}_infos_train.pkl')
     info_val_path = osp.join(root_path, f'{info_prefix}_infos_val.pkl')
-    info_trainval_path = osp.join(root_path,
-                                  f'{info_prefix}_infos_trainval.pkl')
+    # info_trainval_path = osp.join(root_path,
+    #                               f'{info_prefix}_infos_trainval.pkl')
     info_test_path = osp.join(root_path, f'{info_prefix}_infos_test.pkl')
     kitti.export_2d_annotation(root_path, info_train_path)
     kitti.export_2d_annotation(root_path, info_val_path)
-    kitti.export_2d_annotation(root_path, info_trainval_path)
+    # kitti.export_2d_annotation(root_path, info_trainval_path)
     kitti.export_2d_annotation(root_path, info_test_path)
 
     create_groundtruth_database(
@@ -40,8 +40,18 @@ def kitti_data_prep(root_path, info_prefix, version, out_dir):
         f'{out_dir}/{info_prefix}_infos_train.pkl',
         relative_path=False,
         mask_anno_path='instances_train.json',
-        with_mask=(version == 'mask'))
+        with_mask=(version == 'mask'),
+        training=True)
 
+    create_groundtruth_database(
+        'TorcDataset',
+        root_path,
+        info_prefix,
+        f'{out_dir}/{info_prefix}_infos_val.pkl',
+        relative_path=False,
+        mask_anno_path='instances_train.json',
+        with_mask=(version == 'mask'),
+        training=False)
 
 def nuscenes_data_prep(root_path,
                        info_prefix,

@@ -151,4 +151,4 @@ data = dict(
         pcd_limit_range=point_cloud_range
     ),
 )
-evaluation = dict(interval=24, pipeline=test_pipeline)
+evaluation = dict(interval=1, pipeline=test_pipeline)

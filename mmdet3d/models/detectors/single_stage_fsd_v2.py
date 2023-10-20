@@ -443,13 +443,26 @@ class SingleStageFSDV2(SingleStage3DDetector):
                       gt_labels_3d,
                       gt_bboxes_ignore=None,
                       runtime_info=None):
+        """The main function to train fsdv2
+
+        Args:
+            points (_type_): _description_
+            img_metas (_type_): _description_
+            gt_bboxes_3d (_type_): _description_
+            gt_labels_3d (_type_): _description_
+            gt_bboxes_ignore (_type_, optional): _description_. Defaults to None.
+            runtime_info (_type_, optional): _description_. Defaults to None.
+
+        Returns:
+            _type_: _description_
+        """
         if runtime_info is not None:
-            self.runtime_info = runtime_info # stupid way to get arguements from children class
+            self.runtime_info = runtime_info # stupid way to get arguments from children class
         losses = {}
         gt_bboxes_3d = [b[l>=0] for b, l in zip(gt_bboxes_3d, gt_labels_3d)]
         gt_labels_3d = [l[l>=0] for l in gt_labels_3d]
 
-        bsz = len(points)
+        bsz = len(points)  # batch size
 
         seg_out_dict = self.segmentor(points=points, img_metas=img_metas, gt_bboxes_3d=gt_bboxes_3d, gt_labels_3d=gt_labels_3d, as_subsegmentor=True)
 

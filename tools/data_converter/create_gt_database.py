@@ -118,7 +118,8 @@ def create_groundtruth_database(dataset_class_name,
                                 lidar_only=False,
                                 bev_only=False,
                                 coors_range=None,
-                                with_mask=False):
+                                with_mask=False,
+                                training=True):
     """Given the raw data, generate the ground truth database.
 
     Args:
@@ -147,7 +148,6 @@ def create_groundtruth_database(dataset_class_name,
         file_client_args = dict(backend='disk')
         dataset_cfg.update(
             test_mode=False,
-            split='training',
             modality=dict(
                 use_lidar=True,
                 use_depth=False,
@@ -172,13 +172,14 @@ def create_groundtruth_database(dataset_class_name,
         file_client_args = dict(backend='disk')
         dataset_cfg.update(
             test_mode=False,
-            split='training',
+            split='training' if training else 'testing',
             modality=dict(
                 use_lidar=True,
                 use_depth=False,
                 use_lidar_intensity=True,
                 use_camera=False,
             ),
+            pts_prefix='velodyne',
             pcd_limit_range=[-204.8, -204.8, -3.2, 204.8, 204.8, 3.2],
             pipeline=[
                 dict(
@@ -265,12 +266,12 @@ def create_groundtruth_database(dataset_class_name,
             ])
 
     dataset = build_dataset(dataset_cfg)
-
+    dst_postfix = 'train' if training else 'val'
     if database_save_path is None:
-        database_save_path = osp.join(data_path, f'{info_prefix}_gt_database')
+        database_save_path = osp.join(data_path, f'{info_prefix}_gt_database_{dst_postfix}')
     if db_info_save_path is None:
         db_info_save_path = osp.join(data_path,
-                                     f'{info_prefix}_dbinfos_train.pkl')
+                                     f'{info_prefix}_dbinfos_{dst_postfix}.pkl')
     mmcv.mkdir_or_exist(database_save_path)
     all_db_infos = dict()
     if with_mask:
@@ -337,7 +338,7 @@ def create_groundtruth_database(dataset_class_name,
         for i in range(num_obj):
             filename = f'{image_idx}_{names[i]}_{i}.bin'
             abs_filepath = osp.join(database_save_path, filename)
-            rel_filepath = osp.join(f'{info_prefix}_gt_database', filename)
+            rel_filepath = osp.join(f'{info_prefix}_gt_database_{dst_postfix}', filename)
 
             # save point clouds and image patches for each object
             gt_points = points[point_indices[:, i]]
