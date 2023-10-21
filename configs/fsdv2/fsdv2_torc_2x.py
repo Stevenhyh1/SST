@@ -1,9 +1,3 @@
-# _base_ = [
-#     "../_base_/datasets/torc-3d.py",
-#     "../_base_/schedules/cosine_2x.py",
-#     "../_base_/default_runtime.py",
-# ]
-
 # dataset settings
 data_root = "data/kitti/"
 dataset_type = "TorcDataset"
@@ -159,23 +153,13 @@ data = dict(
         pcd_limit_range=point_cloud_range
     ),
 )
-evaluation = dict(interval=1, pipeline=test_pipeline)
 
-seg_voxel_size = (0.2, 0.2, 0.2)
-point_cloud_range = [-204.8, -204.8, -3.2, 204.8, 204.8, 3.2]
+seg_voxel_size = (0.4, 0.4, 0.4)
 virtual_voxel_size = (0.4, 0.4, 0.4)  # (1024, 1024, 16)
 
 sparse_shape = [32, 2048, 2048]
 
-# class_names = [
-#     "Dynamic--Vehicle--Passenger--Car",
-#     "Dynamic--Vehicle--SemiTruck--Trailer",
-#     "Dynamic--Vehicle--SemiTruck--Cab",
-#     "Dynamic--Vehicle",
-#     "Static--RoadObstruction--Barrel",
-#     "Static--RoadObstruction--TemporaryBarrier",
-#     "Static--RoadObstruction--Cone",
-# ]
+
 group1 = ["Dynamic--Vehicle--Passenger--Car"]
 group2 = ["Dynamic--Vehicle--SemiTruck--Trailer"]
 group3 = ["Dynamic--Vehicle--SemiTruck--Cab"]
@@ -408,7 +392,7 @@ lr_config = dict(
 )
 momentum_config = None
 runner = dict(type='EpochBasedRunner', max_epochs=24)
-
+evaluation = dict(interval=3, pipeline=test_pipeline)
 checkpoint_config = dict(interval=1)
 log_config = dict(
     interval=50,
@@ -416,39 +400,9 @@ log_config = dict(
         dict(type='TextLoggerHook'),
         dict(type='TensorboardLoggerHook')
     ])
-# yapf:enable
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = None
 load_from = None
 resume_from = None
 workflow = [('train', 1)]
-
-# data = dict(
-#     samples_per_gpu=2,
-#     workers_per_gpu=4,
-#     train=dict(type="RepeatDataset", times=1),
-# )
-# log_config = dict(interval=50)
-# load_from='./data/pretrain/argo_segmentation_pretrain.pth'
-# lr = 2e-5
-# optimizer = dict(
-#     type="AdamW",
-#     lr=lr,
-#     betas=(0.9, 0.999),  # the momentum is change during training
-#     weight_decay=0.05,
-#     paramwise_cfg=dict(custom_keys={"norm": dict(decay_mult=0.0)}),
-# )
-# custom_hooks = [
-#     dict(
-#         type="DisableAugmentationHook",
-#         num_last_epochs=24,
-#         skip_type_keys=("ObjectSample",),
-#     ),
-#     dict(
-#         type="EnableFSDDetectionHookIter",
-#         enable_after_iter=3000,
-#         threshold_buffer=0.3,
-#         buffer_iter=6000,
-#     ),
-# ]

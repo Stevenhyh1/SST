@@ -18,6 +18,7 @@ from ..core.bbox import (
 )
 from .custom_3d import Custom3DDataset
 from .pipelines import Compose
+from mmdet3d.core.evaluation import kitti_eval
 
 
 @DATASETS.register_module()
@@ -321,34 +322,11 @@ class TorcDataset(Custom3DDataset):
             dict[str, float]: Results of each evaluation metric.
         """
         result_files, tmp_dir = self.format_results(results, pklfile_prefix)
-        from mmdet3d.core.evaluation import kitti_eval
 
         gt_annos = [info["annos"] for info in self.data_infos]
 
-        if isinstance(result_files, dict):
-            ap_dict = dict()
-            for name, result_files_ in result_files.items():
-                eval_types = ["bbox", "bev", "3d"]
-                if "img" in name:
-                    eval_types = ["bbox"]
-                ap_result_str, ap_dict_ = kitti_eval(
-                    gt_annos, result_files_, self.CLASSES, eval_types=eval_types
-                )
-                for ap_type, ap in ap_dict_.items():
-                    ap_dict[f"{name}/{ap_type}"] = float("{:.4f}".format(ap))
-
-                print_log(f"Results of {name}:\n" + ap_result_str, logger=logger)
-
-        else:
-            if metric == "img_bbox":
-                ap_result_str, ap_dict = kitti_eval(
-                    gt_annos, result_files, self.CLASSES, eval_types=["bbox"]
-                )
-            else:
-                ap_result_str, ap_dict = kitti_eval(
-                    gt_annos, result_files, self.CLASSES, eval_types=["bev"]
-                )  # only running this
-            print_log("\n" + ap_result_str, logger=logger)
+        ap_result_str, ap_dict = kitti_eval(gt_annos, result_files, self.CLASSES, eval_types=["bev"])
+        print_log("\n" + ap_result_str, logger=logger)
 
         if tmp_dir is not None:
             tmp_dir.cleanup()
@@ -537,23 +515,14 @@ class TorcDataset(Custom3DDataset):
         minxy = torch.min(box_corners_in_image, dim=1)[0]
         maxxy = torch.max(box_corners_in_image, dim=1)[0]
         box_2d_preds = torch.cat([minxy, maxxy], dim=1)  # (m, 4)
-        # Post-processing
-        # check box_preds_camera
-        # TODO: Why needing this camera filter? 
-        image_shape = box_preds.tensor.new_tensor(img_shape) 
-        valid_cam_inds = (
-            (box_2d_preds[:, 0] < image_shape[1])
-            & (box_2d_preds[:, 1] < image_shape[0])
-            & (box_2d_preds[:, 2] > 0)
-            & (box_2d_preds[:, 3] > 0)
-        )  # (n, ) bool
+
         # check box_preds
         # TODO: A portion of boxes are filtered out by z, do we want that
         limit_range = box_preds.tensor.new_tensor(self.pcd_limit_range)
         valid_pcd_inds = (box_preds.center > limit_range[:3]) & (
             box_preds.center < limit_range[3:]
         )  # (n, 3) bool, next line find all for all xyz altogether
-        valid_inds = valid_cam_inds & valid_pcd_inds.all(-1)
+        valid_inds = valid_pcd_inds.all(-1)
 
         if valid_inds.sum() > 0:
             return dict(
