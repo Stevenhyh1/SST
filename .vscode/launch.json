@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Train Torc",
+            "type": "python",
+            "request": "launch",
+            "program": "tools/train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "configs/fsdv2/fsdv2_torc_2x.py",
+                "--work-dir", "./work_dirs/fsdv2_torc_2x/",
+                "--cfg-options", "evaluation.pklfile_prefix=./work_dirs/fsdv2_torc_2x/results", "evaluation.metric=fast",
+                "--seed", "1"
+            ],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

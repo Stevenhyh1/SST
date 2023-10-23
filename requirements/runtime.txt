@@ -13,4 +13,4 @@ ipdb
 kornia==0.4.0
 spconv-cu102
 yapf==0.40.1
-nuscenes-devkit==1.0.9
+# nuscenes-devkit==1.0.9
